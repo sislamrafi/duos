@@ -1,0 +1,157 @@
+#include "../include/kstdio.h"
+/**
+ * first argument define the type of string to kprintf and kscanf,
+ * %c for charater
+ * %s for string,
+ * %d for integer
+ * %x hexadecimal
+ * %f for floating point number
+ */
+
+void stdout_ch(char ch)
+{
+    UART_SendChar(USART2, ch);
+}
+
+void stdout_string(char *ch)
+{
+    _USART_WRITE(USART2, ch);
+}
+
+uint8_t stdin_string(char *buff, uint16_t size){
+    return _USART_READ(USART2,buff,size);
+}
+
+char *itoa(int32_t val, int base)
+{
+
+    static char buf[32] = {0};
+
+    uint8_t sign = val > 0 ? 0 : 1;
+    val = val > 0 ? val : val * -1;
+
+    int i = 30;
+
+    if (val == 0)
+        buf[i--] = '0';
+
+    for (; val && i; --i, val /= base)
+
+        buf[i] = "0123456789abcdef"[val % base];
+
+    if (sign)
+        buf[i--] = '-';
+
+    return &buf[i + 1];
+}
+
+char *itoaf(double n, uint8_t base, int afterpoint)
+{
+    static char buf[32] = {0};
+
+    DoubleExpand dex = __dexpand(n);
+
+    // Extract integer part
+    int32_t ipart = (int32_t)dex.ipart * (int32_t)dex.sign;
+    int32_t fpart = (int32_t)dex.fpart;
+
+    char *icpart = itoa(ipart, base);
+    int i = 0;
+    for (int j = 0; icpart[j] != 0; j++, i++)
+        buf[i] = icpart[j];
+    buf[i++] = '.';
+
+    char *fcpart = itoa(fpart, base);
+    for (int j = 0; fcpart[j] != 0; j++, i++)
+        buf[i] = fcpart[j];
+    buf[i] = 0;
+
+    return &buf;
+}
+
+void kprintf(uint8_t *format, ...)
+{
+    va_list arguments;
+    va_start(arguments, format);
+
+
+    for (int k = 0; format[k] != 0; k++)
+    {
+        if (format[k] != '%')
+        {
+            stdout_ch(format[k]);
+        }
+        else
+        {
+            char code = format[++k];
+            switch (code)
+            {
+            case 'd':
+                stdout_string(itoa(va_arg(arguments, int), 10));
+                break;
+            case 'x':
+                stdout_string(itoa(va_arg(arguments, int), 16));
+                break;
+            case 'c':
+                stdout_ch((char)va_arg(arguments, int));
+                break;
+            case 's':
+                stdout_string(va_arg(arguments, char *));
+                break;
+            case 'f':
+                stdout_string(itoaf(va_arg(arguments, double), 10, 6));
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    va_end(arguments);
+}
+
+void kscanf(uint8_t *format, ...)
+{
+    va_list arguments;
+    va_start(arguments, format);
+
+    const size_buff_scanf = 100;
+    char buff[size_buff_scanf];
+
+    volatile uint8_t cur_read_size = 0;
+
+    for (int k = 0; format[k] != 0; k++)
+    {
+        if (format[k] != '%')
+        {
+            continue;
+        }
+        else
+        {
+            char code = format[++k];
+            switch (code)
+            {
+            case 'd':
+                cur_read_size = stdin_string(buff,size_buff_scanf-1);
+                kprintf("\nWriting data.. Size: %d",cur_read_size);
+                break;
+            case 'x':
+                stdout_string(itoa(va_arg(arguments, int), 16));
+                break;
+            case 'c':
+                stdout_ch((char)va_arg(arguments, int));
+                break;
+            case 's':
+                stdout_string(va_arg(arguments, char *));
+                break;
+            case 'f':
+                stdout_string(itoaf(va_arg(arguments, double), 10, 6));
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    va_end(arguments);
+}

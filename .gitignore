@@ -1,0 +1,9 @@
+.vscode/*
+src/.vscode/*
+src/sotom-dev/build/*
+src/sotom-dev/makefile
+src/test/*
+src/kern/asst01/object/
+src/kern/asst01/target/
+src/kern/asst01/mapfiles/
+
