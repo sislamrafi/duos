@@ -26,21 +26,7 @@ void Reset_Handler(void){
 void Default_Handler(void){
 	while(1);
 }
-void  SysTick_Handler(void)
-{
-
-	uint32_t *pICSR = (uint32_t*)0xE000ED04;
-
-    update_global_tick_count();
-
-    //unblock_tasks();
-
-    //pend the pendsv exception
-    //*pICSR |= ( 1 << 28);
-
-	//removes the pendsv exception
-    //*pICSR |= ( 1 << 27);
-}
+\
 
 //2. implement the fault handlers
 void HardFault_Handler(void)
