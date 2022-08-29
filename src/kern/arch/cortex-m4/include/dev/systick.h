@@ -1,7 +1,7 @@
 #include "../sys/cortex_m4_preps.h"
 
-extern volatile uint32_t ms_count;
-extern volatile uint32_t sys_tick_load_value_in_ms;
+extern volatile uint32_t MSCOUNT;
+extern volatile uint32_t TICKCOUNT;
 
 void sysTick_init(uint32_t);
 void sysTick_enable(void);
