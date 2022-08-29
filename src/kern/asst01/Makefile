@@ -8,7 +8,7 @@ CFLAGS = -mcpu=$(MACH) -mthumb -c -g -DSTM32 -DSTM32F4  $(FPU) -std=gnu11 -Wall 
 LFLAGS =   -nostdlib -nostartfiles -nodefaultlibs  -mcpu=$(MACH) -mthumb $(FPU) -T stm32_ls.ld -Wl,-Map=$(MAPDIR)/asst01.map -Wl,--start-group -lc -lm -lgcc -Wl,--end-group
 
 
-all:app_libs_timer_timer.o app_libs_debug_debug.o __kern_kstdio_kstdio.o __kern_kmain_kmain.o __kern_softfp_softfp.o __kern_kmain_sys_init.o __kern_arch_stm32f446re_dev_clock.o __kern_arch_stm32f446re_dev_gpio.o __kern_arch_stm32f446re_dev_usart.o __kern_arch_stm32f446re_dev_timer.o __kern_arch_cortex-m4_dev_fpu.o __kern_arch_stm32f446re_sys_stm32_startup.o asst01
+all:app_libs_timer_timer.o app_libs_debug_debug.o __kern_kstdio_kstdio.o __kern_kmain_kmain.o __kern_softfp_softfp.o __kern_kmain_sys_init.o __kern_arch_stm32f446re_dev_clock.o __kern_arch_stm32f446re_dev_gpio.o __kern_arch_stm32f446re_dev_usart.o __kern_arch_stm32f446re_dev_timer.o __kern_arch_cortex-m4_dev_fpu.o __kern_arch_stm32f446re_sys_stm32_startup.o __kern_arch_cortex-m4_dev_systick.o asst01
 
 asst01:app_libs_timer_timer.o app_libs_debug_debug.o __kern_kstdio_kstdio.o __kern_kmain_kmain.o __kern_softfp_softfp.o __kern_kmain_sys_init.o __kern_arch_stm32f446re_dev_clock.o __kern_arch_stm32f446re_dev_gpio.o __kern_arch_stm32f446re_dev_usart.o __kern_arch_stm32f446re_dev_timer.o __kern_arch_cortex-m4_dev_fpu.o __kern_arch_stm32f446re_sys_stm32_startup.o 
 	$(CC) $(LFLAGS) $(OBJECT)/*.o  -o $(TARGET)/$@
@@ -45,6 +45,9 @@ __kern_arch_stm32f446re_dev_timer.o:../arch/stm32f446re/dev/timer.c
 	$(CC) $(CFLAGS) -o $(OBJECT)/$@ $^
 
 __kern_arch_cortex-m4_dev_fpu.o:../arch/cortex-m4/dev/fpu.c
+	$(CC) $(CFLAGS) -o $(OBJECT)/$@ $^
+
+__kern_arch_cortex-m4_dev_systick.o:../arch/cortex-m4/dev/systick.c
 	$(CC) $(CFLAGS) -o $(OBJECT)/$@ $^
 
 __kern_arch_stm32f446re_sys_stm32_startup.o:../arch/stm32f446re/sys/stm32_startup.c
