@@ -5,7 +5,7 @@ double aaaa = 0.0;
 uint64_t cnv_check0 = 0;
 uint32_t cnv_check1 = 0;
 double dchk = 0.5f;
-
+    
 DoubleExpand __dexpand(double n, __D2FLAGS d2flags)
 {
     DoubleExpand dex = {0, 0, 0};

@@ -3,6 +3,7 @@
 #include "../arch/stm32f446re/include/dev/usart.h"
 #include "../arch/stm32f446re/include/dev/gpio.h"
 #include "../arch/cortex-m4/include/dev/fpu.h"
+#include "../arch/cortex-m4/include/dev/systick.h"
 
 /** Include this libs for sotom support **/
 #include "../../sotom-dev/app/libs/debug/debug.h"
@@ -12,6 +13,7 @@
 void __sys_init(void)
 {
 	DRV_CLOCK_INIT(); //configure system clock 180 MHz
+	DRV_SYSTICK_INIT();
 	DRV_FPU_ACTIVE();
 	DRV_GPIO_INIT(GPIOA);
 	DRV_USART_INIT(USART2); //configure as standard input and output

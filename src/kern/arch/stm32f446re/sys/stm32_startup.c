@@ -36,7 +36,10 @@ void  SysTick_Handler(void)
     //unblock_tasks();
 
     //pend the pendsv exception
-    *pICSR |= ( 1 << 28);
+    //*pICSR |= ( 1 << 28);
+
+	//removes the pendsv exception
+    //*pICSR |= ( 1 << 27);
 }
 
 //2. implement the fault handlers
@@ -45,7 +48,6 @@ void HardFault_Handler(void)
 //	printf("Exception : Hardfault\n");
 	while(1);
 }
-
 
 void MemManage_Handler(void)
 {
