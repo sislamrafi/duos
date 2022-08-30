@@ -51,5 +51,5 @@ void delay(uint32_t dly)
 void SysTick_Handler() {
     MSCOUNT += ((SysTick->LOAD + 1) / 22500);
     TICKCOUNT++;
-    // kprintf("tick! %d\n", TICKCOUNT);
+    kprintf("tick=%d ms=%d\n", TICKCOUNT, MSCOUNT);
 }
