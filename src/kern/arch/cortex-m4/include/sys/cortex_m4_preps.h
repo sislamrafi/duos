@@ -3,16 +3,46 @@
 
 #include <stdint.h>
 
-// cortex-m4 internal perepheral
+// cortex-m4 internal perepherals
 
-#include <stdint.h>
+/*
+    Data structure for SCB (System Control Block)
+*/
+typedef struct
+{
+  volatile uint32_t CPUID;
+  volatile uint32_t ICSR;
+  volatile uint32_t VTOR;
+  volatile uint32_t AIRCR;
+  volatile uint32_t SCR;
+  volatile uint32_t CCR;
+  volatile uint32_t SHPR1;
+  volatile uint32_t SHPR2;
+  volatile uint32_t SHPR3;
+  volatile uint32_t SHCSR;
+  volatile uint32_t CFSR;
+  volatile uint32_t HFSR;
+  volatile uint32_t MMAR;
+  volatile uint32_t BFAR;
+  volatile uint32_t AFSR;
+  uint8_t reserved[76];
+  volatile uint32_t CPACR;
+} SCB_type;
+#define SCB ((SCB_type *)0xE000ED00)
 
-/* following defines should be used for structure members */
-#define __IM \
-  volatile const      /*! Defines 'read only' structure member permissions */
-#define __OM volatile /*! Defines 'write only' structure member permissions */
-#define __IOM \
-  volatile /*! Defines 'read / write' structure member permissions */
+
+/*
+    Data structure for SysTick
+*/
+typedef struct
+{
+  volatile uint32_t CTRL;
+  volatile uint32_t LOAD;
+  volatile uint32_t VAL;
+  volatile uint32_t CALIB;
+}SysTick_type;
+#define SysTick ((SysTick_type *)0xE000E010)
+
 
 typedef enum
 {
@@ -117,28 +147,27 @@ typedef enum
 /*
     Data Structure for NVIC
 */
-
 typedef struct
 {
-  __IOM uint32_t
+  volatile uint32_t
     ISER[8U]; /*!< Offset: 0x000 (R/W)  Interrupt Set Enable Register */
   uint32_t RESERVED0[24U];
-  __IOM uint32_t
+  volatile uint32_t
     ICER[8U]; /*!< Offset: 0x080 (R/W)  Interrupt Clear Enable Register */
   uint32_t RESERVED1[24U];
-  __IOM uint32_t
+  volatile uint32_t
     ISPR[8U]; /*!< Offset: 0x100 (R/W)  Interrupt Set Pending Register */
   uint32_t RESERVED2[24U];
-  __IOM uint32_t
+  volatile uint32_t
     ICPR[8U]; /*!< Offset: 0x180 (R/W)  Interrupt Clear Pending Register */
   uint32_t RESERVED3[24U];
-  __IOM uint32_t
+  volatile uint32_t
     IABR[8U]; /*!< Offset: 0x200 (R/W)  Interrupt Active bit Register */
   uint32_t RESERVED4[56U];
-  __IOM uint8_t IP[240U]; /*!< Offset: 0x300 (R/W)  Interrupt Priority Register
+  volatile uint8_t IP[240U]; /*!< Offset: 0x300 (R/W)  Interrupt Priority Register
                              (8Bit wide) */
   uint32_t RESERVED5[644U];
-  __OM uint32_t
+  volatile uint32_t
     STIR; /*!< Offset: 0xE00 ( /W)  Software Trigger Interrupt Register */
 } NVIC_Type;
 
@@ -152,14 +181,21 @@ typedef struct
 #define __ASM __asm
 #endif
 
-#ifndef __COMPILER_BARRIER
-#define __COMPILER_BARRIER() __ASM volatile("" :: \
-                                                : "memory")
-#endif
+
+static inline int __NVIC_GetPriority(IRQn_Type IRQn)
+{
+
+  if ((int32_t)(IRQn) >= 0)
+  {
+    return (NVIC->IP[((uint32_t)IRQn)] >> 4U);
+  }
+  else {
+    return -99;
+  }
+}
 
 static inline void __NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 {
-
   if ((int32_t)(IRQn) >= 0)
   {
     NVIC->IP[((uint32_t)IRQn)] =
@@ -176,42 +212,112 @@ static inline void __NVIC_EnableIRQ(IRQn_Type IRQn)
 {
   if ((int32_t)(IRQn) >= 0)
   {
-    //__COMPILER_BARRIER();
-    NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] =
-      (uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL));
-    //__COMPILER_BARRIER();
+    uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
+    uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
+    NVIC->ISER[reg_pos] |= (1UL << bit_pos);
   }
 }
 
-typedef struct
+static inline void __NVIC_DisableIRQ(IRQn_Type IRQn)
 {
-  uint32_t CPUID;
-  uint32_t ICSR;
-  uint32_t VTOR;
-  uint32_t AIRCR;
-  uint32_t SCR;
-  uint32_t CCR;
-  uint32_t SHPR1;
-  uint32_t SHPR2;
-  uint32_t SHPR3;
-  uint32_t SHCSR;
-  uint32_t CFSR;
-  uint32_t HFSR;
-  uint32_t MMAR;
-  uint32_t BFAR;
-  uint32_t AFSR;
-  uint8_t reserved[76];
-  uint32_t CPACR;
-} SCB_type;
-#define SCB ((SCB_type *)0xE000ED00)
+  if ((int32_t)(IRQn) >= 0)
+  {
+    uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
+    uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
+    NVIC->ICER[reg_pos] |= (1UL << bit_pos);
+  }
+}
 
-typedef struct
-{
-  uint32_t CTRL;
-  uint32_t LOAD;
-  uint32_t VAL;
-  uint32_t CALIB;
-}SysTick_type;
-#define SysTick ((SysTick_type *)0xE000E010)
+static inline uint32_t __NVIC_getStatus(IRQn_Type IRQn) {
+  if ((int32_t)(IRQn) >= 0)
+  {
+    uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
+    uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
+    return ((NVIC->ISER[reg_pos] >> bit_pos) & 0x1);
+  }
+}
+
+static inline void __disable_irq(void) {
+  register uint32_t __primask __ASM("primask");
+  __primask = 1;
+}
+
+static inline void __enable_irq(void) {
+  register uint32_t __primask __ASM("primask");
+  __primask = 0;
+}
+
+static inline void __set_PRIMASK(uint32_t value) {
+  register uint32_t __primask __ASM("primask");
+  __primask = value;
+}
+
+static inline uint32_t __get_PRIMASK(void) {
+  register uint32_t __primask __ASM("primask");
+  return __primask;
+}
+
+static inline void __set_BASEPRI(uint32_t value) {
+  register uint32_t __basepri __ASM("basepri");
+  __basepri = value;
+}
+
+static inline void __unset_BASEPRI() {
+  register uint32_t __basepri __ASM("basepri");
+  __basepri = 0x0;
+}
+
+static inline uint32_t __get_BASEPRI(void) {
+  register uint32_t __basepri __ASM("basepri");
+  return __basepri;
+}
+
+static inline void __set_FAULTMASK(uint32_t value) {
+  register uint32_t __faultmask __ASM("faultmask");
+  __faultmask = value;
+}
+
+static inline void __enable_fault_irq(void) {
+  register uint32_t __faultmask __ASM("faultmask");
+  __faultmask = 0x1;
+}
+
+static inline void __disable_fault_irq(void) {
+  register uint32_t __faultmask __ASM("faultmask");
+  __faultmask = 0x0;
+}
+
+static inline void __clear_pending_IRQn(IRQn_Type IRQn) {
+  if ((int32_t)(IRQn) >= 0)
+  {
+    uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
+    uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
+    NVIC->ICPR[reg_pos] |= (1UL << bit_pos);
+  }
+}
+
+static inline uint32_t __get_pending_IRQn(IRQn_Type IRQn) {
+  if ((int32_t)(IRQn) >= 0)
+  {
+    uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
+    uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
+    return ((NVIC->ICPR[reg_pos] >> bit_pos) & 0x1);
+  }
+  else {
+    return -1;
+  }
+}
+
+static inline uint32_t __get_active_IRQn(IRQn_Type IRQn) {
+  if ((int32_t)(IRQn) >= 0)
+  {
+    uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
+    uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
+    return ((NVIC->IABR[reg_pos] >> bit_pos) & 0x1);
+  }
+  else {
+    return -1;
+  }
+}
 
 #endif

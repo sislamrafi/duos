@@ -1,23 +1,81 @@
 #include "../include/sys_init.h"
 #include "../include/kmain.h"
 #include "../include/kstdio.h"
+#include "../arch/cortex-m4/include/sys/cortex_m4_preps.h"
 #include <stdint.h>
 
-int POKEMON = 0;
+void __systickTest(void);
+void __interruptTest(void);
+
 void kmain(void)
 {
 	__sys_init();
 
-	volatile int a, b;
-	volatile float fp = -45.125f;
-	volatile char str[50] = "Test String";
-	volatile char ch = 'a';
 
 	kprintf("Booting OS CSE: Version: 1.0, Time:%d\r\n\r", getTime());
 	kprintf("Wellcome ....\r\n\r");
 	kprintf("\nCSEOS is ready to take input:\r\n");
 
 	delay(2000);
+
+	__interruptTest();
+
+}
+
+
+
+void __interruptTest() {
+	int priority = 0;
+	int status = 0;
+	__NVIC_EnableIRQ(USART1_IRQn);
+	__NVIC_SetPriority(USART1_IRQn, 10);
+	kprintf("USART1 Interrupt enabled\n");
+	priority = __NVIC_GetPriority(USART1_IRQn);
+	kprintf("USART1 Priority = %d\n", priority);
+	__NVIC_EnableIRQ(USART2_IRQn);
+	__NVIC_SetPriority(USART2_IRQn, 11);
+	kprintf("USART2 Interrupt enabled\n");
+	priority = __NVIC_GetPriority(USART2_IRQn);
+	kprintf("USART2 Priority = %d\n", priority);
+	__NVIC_EnableIRQ(TIM2_IRQn);
+	__NVIC_SetPriority(TIM2_IRQn, 12);
+	kprintf("TIMER2 Interrupt enabled\n");
+	priority = __NVIC_GetPriority(TIM2_IRQn);
+	kprintf("Timer2 Priority = %d\n", priority);
+
+	status = __NVIC_getStatus(USART2_IRQn);
+	kprintf("Usart2 irq status: %d\n", status);
+	delay(1000);
+
+	NVIC->ISER[1] = 0xFF;
+	kprintf("Disabling USART1 interrupt..\n");
+	__NVIC_DisableIRQ(USART1_IRQn);
+	status = __NVIC_getStatus(USART1_IRQn);
+	kprintf("Usart1 irq status: %d\n", status);
+
+	delay(1000);
+	__NVIC_EnableIRQ(USART1_IRQn);
+	__NVIC_DisableIRQ(USART2_IRQn);
+	status = __NVIC_getStatus(USART1_IRQn);
+	kprintf("Usart1 irq status: %d\n", status);
+	status = __NVIC_getStatus(USART2_IRQn);
+	kprintf("Usart2 irq status: %d\n", status);
+	status = __NVIC_getStatus(TIM2_IRQn);
+	kprintf("timer2 irq status: %d\n", status);
+
+
+
+
+
+}
+
+
+
+void __systickTest() {
+	volatile int a, b;
+	volatile float fp = -45.125f;
+	volatile char str[50] = "Test String";
+	volatile char ch = 'a';
 
 	while (1)
 	{
@@ -52,6 +110,7 @@ void kmain(void)
 		{
 		}
 	}
+
 }
 
 

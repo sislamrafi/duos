@@ -20,7 +20,6 @@ void sysTick_init(uint32_t tick_time) {
     TICKCOUNT = 0;
     SysTick->CTRL &= ~(1 << 2);     // Set clocksource to AHB/8
     SysTick->CTRL |= (1 << 1);     // Enable SysTick Interrupt
-    __NVIC_EnableIRQ(SysTick_IRQn);
     SysTick->CTRL |= (1 << 0);     // Enable SysTick Counter
 }
 
@@ -51,5 +50,5 @@ void delay(uint32_t dly)
 void SysTick_Handler() {
     MSCOUNT += ((SysTick->LOAD + 1) / 22500);
     TICKCOUNT++;
-    // kprintf("tick! %d\n", TICKCOUNT);
+    // kprintf("tick=%d ms=%d\n", TICKCOUNT, MSCOUNT);
 }
