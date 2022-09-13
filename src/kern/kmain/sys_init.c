@@ -13,7 +13,7 @@
 void __sys_init(void)
 {
 	DRV_CLOCK_INIT(); //configure system clock 180 MHz
-	sysTick_init(10); //init systick with 10ms interrupt
+	sysTick_init(500); //init systick with 10ms interrupt
 	DRV_FPU_ACTIVE();
 	DRV_GPIO_INIT(GPIOA);
 	DRV_USART_INIT(USART2); //configure as standard input and output
