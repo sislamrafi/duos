@@ -27,6 +27,7 @@ void kmain(void)
 void __interruptTest() {
 	int priority = 0;
 	int status = 0;
+
 	__NVIC_EnableIRQ(USART1_IRQn);
 	__NVIC_SetPriority(USART1_IRQn, 10);
 	kprintf("USART1 Interrupt enabled\n");

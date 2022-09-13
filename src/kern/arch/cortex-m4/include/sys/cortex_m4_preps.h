@@ -214,7 +214,7 @@ static inline void __NVIC_EnableIRQ(IRQn_Type IRQn)
   {
     uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
     uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
-    NVIC->ISER[reg_pos] |= (1UL << bit_pos);
+    NVIC->ISER[reg_pos] = (1UL << bit_pos);
   }
 }
 
@@ -224,7 +224,7 @@ static inline void __NVIC_DisableIRQ(IRQn_Type IRQn)
   {
     uint32_t reg_pos = (((uint32_t)IRQn) >> 5UL);
     uint32_t bit_pos = (((uint32_t)IRQn) & 0x1FUL);
-    NVIC->ICER[reg_pos] |= (1UL << bit_pos);
+    NVIC->ICER[reg_pos] = (1UL << bit_pos);
   }
 }
 
