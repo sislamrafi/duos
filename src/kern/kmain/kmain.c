@@ -1,7 +1,7 @@
 #include "../include/sys_init.h"
 #include "../include/kmain.h"
 #include "../include/kstdio.h"
-#include "../arch/cortex-m4/include/sys/cortex_m4_preps.h"
+#include "../arch/stm32f446re/include/sys/sys.h"
 #include <stdint.h>
 
 void __systickTest(void);
@@ -10,8 +10,6 @@ void __interruptTest(void);
 void kmain(void)
 {
 	__sys_init();
-
-
 	kprintf("Booting OS CSE: Version: 1.0, Time:%d\r\n\r", getTime());
 	kprintf("Wellcome ....\r\n\r");
 	kprintf("\nCSEOS is ready to take input:\r\n");
@@ -48,15 +46,9 @@ void __interruptTest() {
 	kprintf("Usart2 irq status: %d\n", status);
 	delay(1000);
 
-	NVIC->ISER[1] = 0xFF;
 	kprintf("Disabling USART1 interrupt..\n");
-	__NVIC_DisableIRQ(USART1_IRQn);
-	status = __NVIC_getStatus(USART1_IRQn);
-	kprintf("Usart1 irq status: %d\n", status);
 
 	delay(1000);
-	__NVIC_EnableIRQ(USART1_IRQn);
-	__NVIC_DisableIRQ(USART2_IRQn);
 	status = __NVIC_getStatus(USART1_IRQn);
 	kprintf("Usart1 irq status: %d\n", status);
 	status = __NVIC_getStatus(USART2_IRQn);

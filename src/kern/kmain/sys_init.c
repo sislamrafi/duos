@@ -3,7 +3,7 @@
 #include "../arch/stm32f446re/include/dev/usart.h"
 #include "../arch/stm32f446re/include/dev/gpio.h"
 #include "../arch/cortex-m4/include/dev/fpu.h"
-#include "../arch/cortex-m4/include/dev/systick.h"
+#include "../arch/stm32f446re/include/sys/sys.h"
 
 /** Include this libs for sotom support **/
 #include "../../sotom-dev/app/libs/debug/debug.h"

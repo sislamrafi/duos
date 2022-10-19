@@ -4,7 +4,6 @@
 volatile uint32_t MSCOUNT = 0;
 volatile uint32_t TICKCOUNT = 0;
 
-
 void sysTick_enable(void) {
     SysTick->CTRL |= (1 << 0);
 }
