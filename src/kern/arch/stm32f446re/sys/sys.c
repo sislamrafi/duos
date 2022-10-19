@@ -215,7 +215,7 @@ void __enable_irq(void) {
 
 void __set_PRIMASK(uint32_t value) {
     value = value & 0x1;
-    __asm volatile ("MSR primask, %0" : "r" (value));
+    __asm volatile ("MSR primask, %0" : : "r" (value));
 }
 
 uint32_t __get_PRIMASK(void) {
@@ -226,12 +226,12 @@ uint32_t __get_PRIMASK(void) {
 
 void __set_BASEPRI(uint32_t value) {
     value = value & 0xF;
-    __asm volatile ("MSR basepri, %0" : "r" (value));
+    __asm volatile ("MSR basepri, %0" : : "r" (value));
 }
 
 void __unset_BASEPRI(void) {
     uint32_t value = 0x0;
-    __asm volatile ("MSR basepri, %0" : "r" (value));
+    __asm volatile ("MSR basepri, %0" : : "r" (value));
 }
 
 uint32_t __get_BASEPRI(void) {
@@ -242,7 +242,7 @@ uint32_t __get_BASEPRI(void) {
 
 void __set_FAULTMASK(uint32_t value) {
     value = value & 0x1;
-    __asm volatile ("MSR faultmask, %0" : "r" (value));
+    __asm volatile ("MSR faultmask, %0" : : "r" (value));
 }
 
 void __enable_fault_irq(void) {
@@ -381,4 +381,9 @@ void __system_reset(void) {
     SCB->AIRCR &= ~(0xFFFF << 16);
     SCB->AIRCR |= (0x5FA << 16);
     SCB->AIRCR |= (0x1 << 2); // Write 1 to asserts a signal to the outer system that requests a reset.
+}
+
+// activate FPU
+void DRV_FPU_ACTIVE(void) {
+    SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2));
 }

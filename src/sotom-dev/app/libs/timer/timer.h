@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 #include "../../../../kern/arch/stm32f446re/include/sys/stm32_peps.h"
-#include "../../../../kern/arch/cortex-m4/include/sys/cortex_m4_preps.h"
+#include "../../../../kern/arch/stm32f446re/include/sys/sys.h"
+// #include "../../../../kern/arch/cortex-m4/include/sys/cortex_m4_preps.h"
 
 #include "../debug/debug.h"
 

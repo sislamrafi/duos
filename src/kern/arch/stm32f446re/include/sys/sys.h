@@ -193,7 +193,7 @@ typedef struct
   4U /*!< STM32F4XX uses 4 Bits for the Priority Levels */
 
 
-int __NVIC_GetPriority(IRQn_Type IRQn);
+uint32_t __NVIC_GetPriority(IRQn_Type IRQn);
 
 void __NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority);
 
@@ -233,5 +233,7 @@ uint32_t __get_active_IRQn(IRQn_Type IRQn);
 
 // System Reset Request (to be tested)
 void __system_reset(void);
+// activate FPU
+void DRV_FPU_ACTIVE(void);
 
 #endif
